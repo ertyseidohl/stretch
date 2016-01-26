@@ -60,9 +60,9 @@ Level.prototype.allLevels = [
 //DEBUG
 this.game.c.entities.create(ScrollerGateway, {
 	startX: 400,
-	pass: {
-		min: 0,
-		max: 80
+	dashInfo: {
+		height: 200,
+		spacing: 40
 	}
 });
 this.game.c.entities.create(Gateway, {

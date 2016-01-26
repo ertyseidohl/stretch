@@ -1,10 +1,37 @@
+var ScrollerDash = function(game, options) {
+	this.game = game;
+	this.parent = options.parent;
+	this.index = options.index;
+	this.size = this.parent.getDashSize(options.index);
+	this.center = this.parent.getDashCenter(options.index);
+};
+
+ScrollerDash.prototype = {
+	update: function() {
+		this.center.y += this.parent.scrollSpeed;
+		if (this.center.y - (this.size.y / 2) > this.game.height) {
+			this.center.y = this.parent.getNewDashCenterY(this.index);
+		}
+	},
+	draw: function(ctx) {
+		ctx.fillStyle = this.parent.getColor(this.index);
+		ctx.fillRect(
+			this.center.x - (this.size.x / 2),
+			this.center.y - (this.size.y / 2),
+			this.size.x,
+			this.size.y
+		);
+	}
+};
+
 var ScrollerGateway = function(game, options) {
 	/*
 		I would have made this extend gateway but it is so different that
 		the overhead really isn't worth it. So we'll just copy a bit of code.
 	*/
 	this.game = game,
-	this.pass = options.pass,
+	this.dashInfo = options.dashInfo,
+	this.dashes = [];
 	this.size = {
 		//doesn't change
 		x: 30,
@@ -17,18 +44,17 @@ var ScrollerGateway = function(game, options) {
 		y: this.size.y / 2
 	},
 	this.scroll = options.startY || 0 //changes
-	this.passSize = this.pass.max - this.pass.min;
+	this.scrollSpeed = options.scrollSpeed || 1;
+
+	this.initDashes();
 }
 
 
 ScrollerGateway.prototype = {
 	update: function() {
-		this.scroll += 1;
-		if (this.game.groundY + this.scroll > this.game.height) {
-			this.scroll = -this.game.groundY;
-		}
+
 	},
-	getColor: function() {
+	getColor: function(index) {
 		//see also: Gateway.prototype.getColor
 		if (this.isTripped) {
 			var r = Math.random;
@@ -40,25 +66,45 @@ ScrollerGateway.prototype = {
 			return "#222";
 		}
 	},
-	draw: function (ctx) {
-		ctx.fillStyle = this.getColor();
-		var blockSize = this.game.height - this.passSize;
-		//top (min)
-		ctx.fillRect(
-			this.center.x - this.size.x / 2,
-			this.game.groundY - this.pass.max - blockSize + this.scroll,
-			this.size.x,
-			blockSize
-		);
-		//bottom (max)
-		ctx.fillRect(
-			this.center.x - this.size.x / 2,
-			this.game.groundY + this.scroll,
-			this.size.x,
-			blockSize
-		)
+	getDashSize: function(dashIndex) {
+		return {
+			x: this.size.x,
+			y: this.dashInfo.height
+		};
 	},
-	collision: function(other) {
-
+	getDashCenter: function(dashIndex) {
+		return {
+			x: this.center.x,
+			y: (this.dashInfo.height) + ((this.dashInfo.height + this.dashInfo.spacing) * dashIndex)
+		}
+	},
+	initDashes: function() {
+		var getLastDashBottom = function(dashes) {
+			var d = dashes[dashes.length - 1];
+			if (!d) {
+				return 0;
+			}
+			return d.center.y + (d.size.y / 2);
+		}
+		for (var i = 0; getLastDashBottom(this.dashes) < this.game.height; i++) {
+			this.dashes.push(this.game.c.entities.create(ScrollerDash, {
+				parent: this,
+				index: i
+			}));
+		}
+		//and then add one more so that we have one offscreen
+		this.dashes.push(this.game.c.entities.create(ScrollerDash, {
+			parent: this,
+			index: i
+		}));
+	},
+	getNewDashCenterY: function(dashIndex) {
+		var dash = this.dashes[dashIndex];
+		var nextDash = this.dashes[(dashIndex + 1) % this.dashes.length];
+		if (dash === nextDash) {
+			throw new Error("Only One Dash - needs at least two to work. Sorry.");
+		}
+		return nextDash.center.y - (nextDash.size.y) - this.dashInfo.spacing;
 	}
+	//This doesn't draw() or collide(), the DashBlocks do.
 };
