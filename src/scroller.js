@@ -4,13 +4,19 @@ var ScrollerDash = function(game, options) {
 	this.index = options.index;
 	this.size = this.parent.getDashSize(options.index);
 	this.center = this.parent.getDashCenter(options.index);
+	this.zindex = 4;
+	
+	//the player can tip this by this many pixels and still be ok
+	this.playerFunBuffer = 5;
 };
 
 ScrollerDash.prototype = {
 	update: function() {
-		this.center.y += this.parent.scrollSpeed;
-		if (this.center.y - (this.size.y / 2) > this.game.height) {
-			this.center.y = this.parent.getNewDashCenterY(this.index);
+		if (!this.parent.isTripped) {
+			this.center.y += this.parent.scrollSpeed;
+			if (this.center.y - (this.size.y / 2) > this.game.height) {
+				this.center.y = this.parent.getNewDashCenterY(this.index);
+			}
 		}
 	},
 	draw: function(ctx) {
@@ -21,6 +27,22 @@ ScrollerDash.prototype = {
 			this.size.x,
 			this.size.y
 		);
+	},
+	collision: function(other) {
+		if (other instanceof Player) {
+			pTop = other.center.y - (other.size.y / 2);
+			pBot = other.center.y + (other.size.y / 2);
+			tTop = this.center.y - (this.size.y / 2);
+			tBot = this.center.y + (this.size.y / 2);
+			if (tBot - pTop < this.playerFunBuffer) {
+				return;
+			}
+			if (pBot - tTop < this.playerFunBuffer) {
+				return;
+			}
+			this.parent.isTripped = true;
+			other.isAlive = false;
+		}
 	}
 };
 

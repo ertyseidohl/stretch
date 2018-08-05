@@ -57,21 +57,6 @@ Level.prototype.allLevels = [
 			text: "Press x to move",
 			textOffset: -80
 		});
-//DEBUG
-this.game.c.entities.create(ScrollerGateway, {
-	startX: 400,
-	dashInfo: {
-		height: 200,
-		spacing: 40
-	}
-});
-this.game.c.entities.create(Gateway, {
-	startX: 500,
-	pass: {
-		min: 0,
-		max: 80
-	}
-});
 	},
 	//level 1, learn grower
 	function() {
@@ -81,10 +66,10 @@ this.game.c.entities.create(Gateway, {
 		});
 		this.game.c.entities.create(Adjuster, {
 			isGrower: true,
-			startX : 300,
+			startX : 250,
 			startSize: 100,
 			width: 150,
-			maxY: 150,
+			maxY: 200,
 			minY: 100
 		});
 		this.game.c.entities.create(Gateway, {
@@ -218,4 +203,67 @@ this.game.c.entities.create(Gateway, {
 			}
 		});
 	},
+	//level 6 : scroller
+	function() {
+		this.game.c.entities.create(Player, {
+			startX: 100,
+			height: 60
+		});
+		//scroller hurdle
+		this.game.c.entities.create(ScrollerGateway, {
+			startX: 400,
+			dashInfo: {
+				height: 40,
+				spacing: 100
+			}
+		});
+	},
+	//level 7 : scroller dash
+	function() {
+		this.game.c.entities.create(Player, {
+			startX: 100,
+			height: 60
+		});
+
+      this.game.c.entities.create(ScrollerGateway, {
+			startX: 200,
+			dashInfo: {
+				height: 40,
+				spacing: 100
+			}
+		});
+
+      this.game.c.entities.create(ScrollerGateway, {
+			startX: 250,
+			dashInfo: {
+				height: 40,
+				spacing: 110
+			}
+		});
+
+      this.game.c.entities.create(ScrollerGateway, {
+			startX: 300,
+			dashInfo: {
+				height: 40,
+				spacing: 120
+			}
+		});
+
+      this.game.c.entities.create(ScrollerGateway, {
+			startX: 350,
+			dashInfo: {
+				height: 40,
+				spacing: 130
+			}
+		});
+
+      this.game.c.entities.create(ScrollerGateway, {
+			startX: 400,
+			dashInfo: {
+				height: 40,
+				spacing: 140
+			}
+		});
+
+	}
 ];

@@ -14,6 +14,7 @@ var Adjuster = function(game, options) {
 	this.maxY = options.maxY;
 	this.minY = options.minY;
 	this.activeCount = 0;
+	this.zindex = 1;
 };
 
 Adjuster.prototype = {

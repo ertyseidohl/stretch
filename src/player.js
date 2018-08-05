@@ -11,6 +11,7 @@ var Player = function(game, options) {
 	this.height = options.height;
 	this.isAlive = true;
 	this.velocity = 0;
+	this.zindex = 5;
 };
 
 Player.prototype = {
@@ -70,3 +71,6 @@ Player.prototype = {
 	getTop: getTop,
 	getBottom: getBottom
 };
+
+//required for collision
+Player.prototype.constructor = Player;
